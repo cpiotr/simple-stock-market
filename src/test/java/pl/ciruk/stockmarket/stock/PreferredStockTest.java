@@ -10,6 +10,8 @@ import java.util.Random;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static pl.ciruk.stockmarket.math.Decimals.applyDefaultScaleTo;
+import static pl.ciruk.stockmarket.stock.Stocks.samplePreferredStock;
+import static pl.ciruk.stockmarket.stock.Stocks.symbol;
 
 public class PreferredStockTest {
 
@@ -18,6 +20,22 @@ public class PreferredStockTest {
 	@Before
 	public void setUp() throws Exception {
 		random = new Random();
+	}
+
+	@Test
+	public void shouldCalculateDividendYield() throws Exception {
+		// Given
+		PreferredStock stock = samplePreferredStock();
+		BigDecimal priceInPennies = BigDecimal.valueOf(random.nextDouble());
+
+		// When
+		BigDecimal dividendYield = stock.calculateDividendYieldFor(priceInPennies);
+
+		// Then
+		assertThat(dividendYield, is(
+				applyDefaultScaleTo(stock.getFixedDividend())
+						.multiply(applyDefaultScaleTo(stock.getParValueInPennies()))
+						.divide(applyDefaultScaleTo(priceInPennies), RoundingMode.HALF_UP)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -57,31 +75,5 @@ public class PreferredStockTest {
 
 		// When
 		stock.calculateDividendYieldFor(BigDecimal.ONE);
-	}
-
-	@Test
-	public void shouldCalculateDividendYield() throws Exception {
-		// Given
-		PreferredStock stock = samplePreferredStock();
-		BigDecimal priceInPennies = BigDecimal.valueOf(random.nextDouble());
-
-		// When
-		BigDecimal dividendYield = stock.calculateDividendYieldFor(priceInPennies);
-
-		// Then
-		assertThat(dividendYield, is(
-				applyDefaultScaleTo(stock.getFixedDividend())
-						.multiply(applyDefaultScaleTo(stock.getParValueInPennies()))
-						.divide(applyDefaultScaleTo(priceInPennies), RoundingMode.HALF_UP)));
-	}
-
-	private PreferredStock samplePreferredStock() {
-		BigDecimal parValueInPennies = BigDecimal.valueOf(random.nextLong());
-		BigDecimal fixedDividend = BigDecimal.valueOf(random.nextDouble());
-		return new PreferredStock(symbol(), parValueInPennies, fixedDividend);
-	}
-
-	private String symbol() {
-		return "TEA";
 	}
 }
