@@ -5,8 +5,6 @@ import lombok.Value;
 import java.math.BigDecimal;
 
 @Value
-public abstract class Stock {
-	String symbol;
-
-	BigDecimal parValueInPennies;
+public class PreferredStock extends Stock{
+	BigDecimal fixedDividend;
 }
