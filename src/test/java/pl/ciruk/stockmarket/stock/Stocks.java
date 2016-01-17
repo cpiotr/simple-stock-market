@@ -3,7 +3,7 @@ package pl.ciruk.stockmarket.stock;
 import java.math.BigDecimal;
 import java.util.Random;
 
-public class Stocks {
+class Stocks {
 	private static Random RANDOM = new Random();
 
 	public static PreferredStock samplePreferredStock() {
