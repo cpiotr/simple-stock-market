@@ -143,12 +143,13 @@ public class StockTest {
 				.price(new BigDecimal("10023.3455"))
 				.quantity(new BigDecimal("2346"))
 				.build();
-		stock.record(firstTrade);
 
 		Trade secondTrade = Trade.builder()
 				.price(new BigDecimal("279.66"))
 				.quantity(new BigDecimal("9988"))
 				.build();
+
+		stock.record(firstTrade);
 		stock.record(secondTrade);
 		return stock;
 	}

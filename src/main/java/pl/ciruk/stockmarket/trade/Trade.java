@@ -12,10 +12,13 @@ import java.util.Comparator;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @Builder
+@EqualsAndHashCode
 public class Trade {
-	public static final Comparator<Trade> BY_TIMESTAMP = (t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp());
+	public static final Comparator<Trade> BY_TIMESTAMP = Comparator.comparing(Trade::getTimestamp)
+			.thenComparing(Trade::getStock, Comparator.nullsFirst(Comparator.naturalOrder()))
+			.thenComparing(Trade::getQuantity, Comparator.nullsFirst(Comparator.naturalOrder()))
+			.thenComparing(Trade::getPrice, Comparator.nullsFirst(Comparator.naturalOrder()));
 
 	private String stock;
 

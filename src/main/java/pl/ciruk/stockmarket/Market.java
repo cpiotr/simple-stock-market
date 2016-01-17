@@ -47,7 +47,7 @@ public class Market {
 				.calculatePriceEarningsRatioFor(price);
 	}
 
-	public Optional<Stock> findStockFor(String symbol) {
+	Optional<Stock> findStockFor(String symbol) {
 		return Optional.ofNullable(
 				stocks.get(symbol)
 		);
