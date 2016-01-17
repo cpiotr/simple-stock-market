@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static pl.ciruk.stockmarket.Matchers.closeTo;
 import static pl.ciruk.stockmarket.Matchers.emptyOptional;
 import static pl.ciruk.stockmarket.Matchers.optionalValue;
 import static pl.ciruk.stockmarket.stock.Stocks.symbol;
@@ -88,7 +89,7 @@ public class MarketTest {
 		// Given
 		market = new Market();
 		market.register(
-				new PreferredStock(registeredStock(), BigDecimal.ONE, BigDecimal.TEN)
+				new PreferredStock(registeredStock(), BigDecimal.ONE, BigDecimal.TEN, null)
 		);
 
 		// When
@@ -104,7 +105,7 @@ public class MarketTest {
 		// Given
 		market = new Market();
 		market.register(
-				new PreferredStock(registeredStock(), BigDecimal.ONE, BigDecimal.TEN)
+				new PreferredStock(registeredStock(), BigDecimal.ONE, BigDecimal.TEN, null)
 		);
 
 		// When
@@ -115,7 +116,55 @@ public class MarketTest {
 		assertThat(stock, is(emptyOptional()));
 	}
 
+	@Test
+	public void shouldCalculateAllShareIndex() throws Exception {
+		// Given
+		marketHasANumberOfStocks();
 
+		market.record(Trade.builder().stock("TEA").price(BigDecimal.valueOf(2)).quantity(BigDecimal.TEN).build());
+		market.record(Trade.builder().stock("TEA").price(BigDecimal.valueOf(4)).quantity(BigDecimal.valueOf(20)).build());
+		double teaTotalPrice = 2 * 10 + 4 * 20;
+		double teaTotalQuantity = 10 + 20;
+		double teaPrice = teaTotalPrice / teaTotalQuantity;
+
+		market.record(Trade.builder().stock("POP").price(BigDecimal.valueOf(3)).quantity(BigDecimal.TEN).build());
+		market.record(Trade.builder().stock("POP").price(BigDecimal.valueOf(9)).quantity(BigDecimal.valueOf(20)).build());
+		double popTotalPrice = 3 * 10 + 9 * 20;
+		double popTotalQuantity = 10 + 20;
+		double popPrice = popTotalPrice / popTotalQuantity;
+
+		market.record(Trade.builder().stock("ALE").price(BigDecimal.valueOf(5)).quantity(BigDecimal.TEN).build());
+		market.record(Trade.builder().stock("ALE").price(BigDecimal.valueOf(2)).quantity(BigDecimal.valueOf(20)).build());
+		double aleTotalPrice = 5 * 10 + 2 * 20;
+		double aleTotalQuantity = 10 + 20;
+		double alePrice = aleTotalPrice / aleTotalQuantity;
+
+		// When
+		BigDecimal allShareIndex = market.calculateAllShareIndex();
+
+		// Then
+		BigDecimal index = BigDecimal.valueOf(Math.pow(teaPrice * popPrice * alePrice, 1.0 / 3.0));
+		assertThat(allShareIndex, is(closeTo(index)));
+	}
+
+	private void marketHasANumberOfStocks() {
+		market = new Market();
+		market.register(
+				new CommonStock("TEA", BigDecimal.valueOf(100), BigDecimal.ZERO)
+		);
+		market.register(
+				new CommonStock("POP", BigDecimal.valueOf(100), BigDecimal.valueOf(8))
+		);
+		market.register(
+				new CommonStock("ALE", BigDecimal.valueOf(60), BigDecimal.valueOf(23))
+		);
+		market.register(
+				new PreferredStock("GIN", BigDecimal.valueOf(100), BigDecimal.valueOf(2), BigDecimal.valueOf(8))
+		);
+		market.register(
+				new CommonStock("JOE", BigDecimal.valueOf(250), BigDecimal.valueOf(13))
+		);
+	}
 
 	private String registeredStock() {
 		return "JPM";

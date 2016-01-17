@@ -4,9 +4,9 @@ import com.google.common.base.Preconditions;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import pl.ciruk.stockmarket.math.Decimals;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import static pl.ciruk.stockmarket.math.Decimals.applyDefaultScaleTo;
 
@@ -14,11 +14,9 @@ import static pl.ciruk.stockmarket.math.Decimals.applyDefaultScaleTo;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class PreferredStock extends Stock {
-	private final BigDecimal fixedDividend;
 
-	public PreferredStock(String symbol, BigDecimal parValueInPennies, BigDecimal fixedDividend) {
-		super(symbol, parValueInPennies);
-		this.fixedDividend = fixedDividend;
+	public PreferredStock(String symbol, BigDecimal parValueInPennies, BigDecimal fixedDividend, BigDecimal lastDividendInPennies) {
+		super(symbol, parValueInPennies, fixedDividend, lastDividendInPennies);
 	}
 
 	@Override
@@ -27,13 +25,14 @@ public class PreferredStock extends Stock {
 		Preconditions.checkArgument(BigDecimal.ZERO.compareTo(priceInPennies) != 0, "Price cannot be equal to zero");
 		BigDecimal normalizedPrice = applyDefaultScaleTo(priceInPennies);
 
-		Preconditions.checkState(fixedDividend != null);
-		BigDecimal normalizedFixedDividend = applyDefaultScaleTo(fixedDividend);
+		Preconditions.checkState(getFixedDividend() != null);
+		BigDecimal normalizedFixedDividend = applyDefaultScaleTo(getFixedDividend());
 
 		Preconditions.checkState(getParValueInPennies() != null);
 		BigDecimal normalizedParValue = applyDefaultScaleTo(getParValueInPennies());
 
-		return normalizedFixedDividend.multiply(normalizedParValue)
-				.divide(normalizedPrice, RoundingMode.HALF_UP);
+		return Decimals.divide(
+				normalizedFixedDividend.multiply(normalizedParValue),
+				normalizedPrice);
 	}
 }

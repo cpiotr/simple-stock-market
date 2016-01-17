@@ -2,9 +2,9 @@ package pl.ciruk.stockmarket.stock;
 
 import org.junit.Before;
 import org.junit.Test;
+import pl.ciruk.stockmarket.math.Decimals;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,9 +33,10 @@ public class PreferredStockTest {
 
 		// Then
 		assertThat(dividendYield, is(
-				applyDefaultScaleTo(stock.getFixedDividend())
-						.multiply(applyDefaultScaleTo(stock.getParValueInPennies()))
-						.divide(applyDefaultScaleTo(priceInPennies), RoundingMode.HALF_UP)));
+				Decimals.divide(
+						applyDefaultScaleTo(stock.getFixedDividend())
+								.multiply(applyDefaultScaleTo(stock.getParValueInPennies())),
+						applyDefaultScaleTo(priceInPennies))));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -61,7 +62,7 @@ public class PreferredStockTest {
 	public void shouldFailCalculationWhenFixedDividendIsMissing() throws Exception {
 		// Given
 		BigDecimal emptyFixedDividend = null;
-		PreferredStock stock = new PreferredStock(symbol(), BigDecimal.ONE, emptyFixedDividend);
+		PreferredStock stock = new PreferredStock(symbol(), BigDecimal.ONE, emptyFixedDividend, null);
 
 		// When
 		stock.calculateDividendYieldFor(BigDecimal.ONE);
@@ -71,7 +72,7 @@ public class PreferredStockTest {
 	public void shouldFailCalculationWhenParValueIsMissing() throws Exception {
 		// Given
 		BigDecimal emptyParValue = null;
-		PreferredStock stock = new PreferredStock(symbol(), emptyParValue, BigDecimal.ONE);
+		PreferredStock stock = new PreferredStock(symbol(), emptyParValue, BigDecimal.ONE, null);
 
 		// When
 		stock.calculateDividendYieldFor(BigDecimal.ONE);

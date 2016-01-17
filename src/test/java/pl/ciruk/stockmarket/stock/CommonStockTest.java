@@ -2,9 +2,9 @@ package pl.ciruk.stockmarket.stock;
 
 import org.junit.Before;
 import org.junit.Test;
+import pl.ciruk.stockmarket.math.Decimals;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -32,8 +32,9 @@ public class CommonStockTest {
 
 		// Then
 		assertThat(dividendYield, is(equalTo(
-				applyDefaultScaleTo(stock.getLastDividendInPennies())
-						.divide(applyDefaultScaleTo(price), RoundingMode.HALF_UP))));
+				Decimals.divide(
+						applyDefaultScaleTo(stock.getLastDividendInPennies()),
+						applyDefaultScaleTo(price)))));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -7,17 +7,17 @@ import lombok.ToString;
 import pl.ciruk.stockmarket.math.Decimals;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CommonStock extends Stock {
-	private final BigDecimal lastDividendInPennies;
+	public CommonStock(String symbol, BigDecimal parValueInPennies, BigDecimal fixedDividend, BigDecimal lastDividendInPennies) {
+		super(symbol, parValueInPennies, fixedDividend, lastDividendInPennies);
+	}
 
 	public CommonStock(String symbol, BigDecimal parValueInPennies, BigDecimal lastDividendInPennies) {
-		super(symbol, parValueInPennies);
-		this.lastDividendInPennies = lastDividendInPennies;
+		super(symbol, parValueInPennies, null, lastDividendInPennies);
 	}
 
 	@Override
@@ -26,12 +26,11 @@ public class CommonStock extends Stock {
 		Preconditions.checkArgument(priceInPennies.compareTo(BigDecimal.ZERO) != 0, "Price cannot be equal to zero");
 		BigDecimal normalizedPrice = Decimals.applyDefaultScaleTo(priceInPennies);
 
-		Preconditions.checkState(lastDividendInPennies != null);
-		BigDecimal normalizedDivided = Decimals.applyDefaultScaleTo(lastDividendInPennies);
+		Preconditions.checkState(getLastDividendInPennies() != null);
+		BigDecimal normalizedDivided = Decimals.applyDefaultScaleTo(getLastDividendInPennies());
 
-		return normalizedDivided.divide(
-				normalizedPrice,
-				RoundingMode.HALF_UP
-		);
+		return Decimals.divide(
+				normalizedDivided,
+				normalizedPrice);
 	}
 }

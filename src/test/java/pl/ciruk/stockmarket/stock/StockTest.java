@@ -2,10 +2,10 @@ package pl.ciruk.stockmarket.stock;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import pl.ciruk.stockmarket.math.Decimals;
 import pl.ciruk.stockmarket.trade.Trade;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -114,8 +114,9 @@ public class StockTest {
 				.build();
 		stock.record(secondTrade);
 
-		BigDecimal expectedPrice = BigDecimal.valueOf(100.5 * 6 + 79.66 * 88)
-				.divide(BigDecimal.valueOf(6 + 88), RoundingMode.HALF_UP);
+		BigDecimal expectedPrice = Decimals.divide(
+				BigDecimal.valueOf(100.5 * 6 + 79.66 * 88),
+				BigDecimal.valueOf(6 + 88));
 
 		// When
 		BigDecimal price = stock.calculateVolumeWeightedPrice(allTrades());
@@ -163,7 +164,7 @@ public class StockTest {
 	}
 
 	private Stock sampleStock() {
-		return new Stock(Stocks.symbol(), BigDecimal.ONE) {
+		return new Stock(Stocks.symbol(), BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE) {
 				@Override
 				public BigDecimal calculateDividendYieldFor(BigDecimal priceInPennies) {
 					return BigDecimal.ONE;

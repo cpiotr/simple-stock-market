@@ -4,6 +4,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 public class Matchers {
@@ -33,6 +35,21 @@ public class Matchers {
 			@Override
 			public void describeTo(Description description) {
 				description.appendText("empty optional");
+			}
+		};
+	}
+
+	public static Matcher<BigDecimal> closeTo(BigDecimal decimal) {
+		return new TypeSafeMatcher<BigDecimal>() {
+			@Override
+			protected boolean matchesSafely(BigDecimal item) {
+				return item.subtract(decimal).abs().setScale(10, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("close to ")
+						.appendValue(decimal);
 			}
 		};
 	}

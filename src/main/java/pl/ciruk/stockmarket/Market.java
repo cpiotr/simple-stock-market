@@ -1,6 +1,7 @@
 package pl.ciruk.stockmarket;
 
 import com.google.common.base.Preconditions;
+import pl.ciruk.stockmarket.math.Decimals;
 import pl.ciruk.stockmarket.stock.Stock;
 import pl.ciruk.stockmarket.trade.Trade;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Market {
 	private Map<String, Stock> stocks = new ConcurrentHashMap<>();
@@ -45,6 +47,17 @@ public class Market {
 
 		return stocks.get(stock)
 				.calculatePriceEarningsRatioFor(price);
+	}
+
+	public BigDecimal calculateAllShareIndex() {
+		AtomicInteger numberOfStocks = new AtomicInteger(0);
+		BigDecimal product = stocks.values().stream()
+				.filter(stock -> stock.containsTrades())
+				.map(stock -> calculateRecentWeightedPriceFor(stock.getSymbol()))
+				.peek(s -> numberOfStocks.incrementAndGet())
+				.reduce(BigDecimal.ONE, BigDecimal::multiply);
+
+		return Decimals.nthRoot(numberOfStocks.get(), product);
 	}
 
 	Optional<Stock> findStockFor(String symbol) {

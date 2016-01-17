@@ -9,7 +9,6 @@ import pl.ciruk.stockmarket.math.Decimals;
 import pl.ciruk.stockmarket.trade.Trade;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -28,6 +27,13 @@ public abstract class Stock {
 	@Getter
 	private final BigDecimal parValueInPennies;
 
+	@Getter
+	private final BigDecimal fixedDividend;
+
+	@Getter
+	private final BigDecimal lastDividendInPennies;
+
+
 	private final Set<Trade> trades = new TreeSet<>(Trade.BY_TIMESTAMP.reversed());
 
 	public abstract BigDecimal calculateDividendYieldFor(BigDecimal priceInPennies);
@@ -39,9 +45,9 @@ public abstract class Stock {
 		BigDecimal dividendYield = calculateDividendYieldFor(normalizedPrice);
 		Preconditions.checkState(dividendYield.compareTo(BigDecimal.ZERO) != 0, "Dividend cannot be equal to zero");
 
-		return normalizedPrice.divide(
-				dividendYield,
-				RoundingMode.HALF_UP);
+		return Decimals.divide(
+				normalizedPrice,
+				dividendYield);
 	}
 
 	public void record(Trade trade) {
@@ -69,11 +75,17 @@ public abstract class Stock {
 		if (isZero(totalQuantity)) {
 			return BigDecimal.ZERO;
 		} else {
-			return totalPrice.divide(totalQuantity, RoundingMode.HALF_UP);
+			return Decimals.divide(
+					totalPrice,
+					totalQuantity);
 		}
 	}
 
 	public Stream<Trade> streamOfTrades() {
 		return trades.stream();
+	}
+
+	public boolean containsTrades() {
+		return !trades.isEmpty();
 	}
 }

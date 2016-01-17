@@ -9,7 +9,7 @@ public class Stocks {
 	public static PreferredStock samplePreferredStock() {
 		BigDecimal parValueInPennies = BigDecimal.valueOf(RANDOM.nextLong());
 		BigDecimal fixedDividend = BigDecimal.valueOf(RANDOM.nextDouble());
-		return new PreferredStock(symbol(), parValueInPennies, fixedDividend);
+		return new PreferredStock(symbol(), parValueInPennies, fixedDividend, null);
 	}
 
 	public static String symbol() {
