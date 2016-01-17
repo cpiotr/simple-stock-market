@@ -30,8 +30,8 @@ public class PreferredStock extends Stock {
 		Preconditions.checkState(fixedDividend != null);
 		BigDecimal normalizedFixedDividend = applyDefaultScaleTo(fixedDividend);
 
-		Preconditions.checkState(parValueInPennies != null);
-		BigDecimal normalizedParValue = applyDefaultScaleTo(parValueInPennies);
+		Preconditions.checkState(getParValueInPennies() != null);
+		BigDecimal normalizedParValue = applyDefaultScaleTo(getParValueInPennies());
 
 		return normalizedFixedDividend.multiply(normalizedParValue)
 				.divide(normalizedPrice, RoundingMode.HALF_UP);

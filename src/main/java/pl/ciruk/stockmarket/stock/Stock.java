@@ -16,9 +16,9 @@ import java.math.RoundingMode;
 @AllArgsConstructor
 public abstract class Stock {
 
-	String symbol;
+	private final String symbol;
 
-	BigDecimal parValueInPennies;
+	private final BigDecimal parValueInPennies;
 
 	public abstract BigDecimal calculateDividendYieldFor(BigDecimal priceInPennies);
 
