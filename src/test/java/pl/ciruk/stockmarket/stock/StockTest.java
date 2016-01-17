@@ -34,10 +34,11 @@ public class StockTest {
 		stock.calculatePriceEarningsRatioFor(emptyPrice);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void shouldFailWhenPriceIsZero() throws Exception {
+	@Test(expected = IllegalStateException.class)
+	public void shouldFailWhenDividendIsZero() throws Exception {
 		// Given
 		Stock stock = mockStock();
+		when(stock.calculateDividendYieldFor(any())).thenReturn(BigDecimal.ZERO);
 
 		// When
 		stock.calculatePriceEarningsRatioFor(BigDecimal.ZERO);
@@ -46,7 +47,7 @@ public class StockTest {
 	private Stock mockStock() {
 		Stock stock = Mockito.mock(Stock.class);
 		when(stock.calculatePriceEarningsRatioFor(any(BigDecimal.class))).thenCallRealMethod();
-		when(stock.calculateDividendYieldFor(any(BigDecimal.class))).thenReturn(BigDecimal.ZERO);
+		when(stock.calculateDividendYieldFor(any(BigDecimal.class))).thenReturn(BigDecimal.ONE);
 		return stock;
 	}
 }

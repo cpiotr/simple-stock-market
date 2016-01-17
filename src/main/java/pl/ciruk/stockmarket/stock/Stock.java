@@ -24,10 +24,13 @@ public abstract class Stock {
 
 	public BigDecimal calculatePriceEarningsRatioFor(BigDecimal priceInPennies) {
 		Preconditions.checkArgument(priceInPennies != null, "Price cannot be null");
-		Preconditions.checkArgument(priceInPennies.compareTo(BigDecimal.ZERO) != 0, "Price cannot be equal to zero");
 		BigDecimal normalizedPrice = Decimals.applyDefaultScaleTo(priceInPennies);
 
-		return calculateDividendYieldFor(normalizedPrice)
-				.divide(priceInPennies, RoundingMode.HALF_UP);
+		BigDecimal dividendYield = calculateDividendYieldFor(normalizedPrice);
+		Preconditions.checkState(dividendYield.compareTo(BigDecimal.ZERO) != 0, "Dividend cannot be equal to zero");
+
+		return normalizedPrice.divide(
+				dividendYield,
+				RoundingMode.HALF_UP);
 	}
 }
