@@ -12,7 +12,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static pl.ciruk.stockmarket.math.Decimals.isZero;
 
 @ToString
 @EqualsAndHashCode
@@ -45,6 +48,29 @@ public abstract class Stock {
 		Preconditions.checkArgument(trade != null, "Trade cannot be null");
 
 		trades.add(trade);
+	}
+
+	public BigDecimal calculateVolumeWeightedPrice(Predicate<Trade> tradeSelector) {
+		BigDecimal totalPrice = BigDecimal.ZERO;
+		BigDecimal totalQuantity = BigDecimal.ZERO;
+
+		for (Trade trade : trades) {
+			if (tradeSelector.test(trade)) {
+				totalPrice = totalPrice.add(
+						trade.getPrice().multiply(trade.getQuantity())
+				);
+
+				totalQuantity = totalQuantity.add(
+						trade.getQuantity()
+				);
+			}
+		}
+
+		if (isZero(totalQuantity)) {
+			return BigDecimal.ZERO;
+		} else {
+			return totalPrice.divide(totalQuantity, RoundingMode.HALF_UP);
+		}
 	}
 
 	public Stream<Trade> streamOfTrades() {
