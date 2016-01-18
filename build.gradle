@@ -14,7 +14,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile 'org.slf4j:slf4j-api:1.7.+'
+    compile 'ch.qos.logback:logback-classic:1.+'
     compile 'org.projectlombok:lombok:1.16.6'
     compile 'com.google.guava:guava:19.0'
 

@@ -1,6 +1,7 @@
 package pl.ciruk.stockmarket;
 
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import pl.ciruk.stockmarket.math.Decimals;
 import pl.ciruk.stockmarket.stock.Stock;
 import pl.ciruk.stockmarket.trade.Trade;
@@ -12,10 +13,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class Market {
 	private Map<String, Stock> stocks = new ConcurrentHashMap<>();
 
 	public void record(Trade trade) {
+		log.debug("record(): trade={}", trade);
 		Preconditions.checkArgument(trade != null, "Trade cannot be null");
 
 		String stock = trade.getStock();
@@ -26,6 +29,7 @@ public class Market {
 	}
 
 	public BigDecimal calculateRecentWeightedPriceFor(String stock) {
+		log.debug("calculateRecentWeightedPriceFor(): stock={}", stock);
 		checkStock(stock);
 
 		LocalDateTime quarterAgo = LocalDateTime.now().minusMinutes(15);
@@ -36,6 +40,7 @@ public class Market {
 	}
 
 	public BigDecimal calculateDividendYieldFor(String stock, BigDecimal price) {
+		log.debug("calculateDividendYieldFor(): stock={}", stock);
 		checkStock(stock);
 
 		return stocks.get(stock)
@@ -43,6 +48,7 @@ public class Market {
 	}
 
 	public BigDecimal calculatePriceEarningRatioFor(String stock, BigDecimal price) {
+		log.debug("calculatePriceEarningRatioFor(): stock={}, price={}", stock, price);
 		checkStock(stock);
 
 		return stocks.get(stock)
@@ -50,12 +56,15 @@ public class Market {
 	}
 
 	public BigDecimal calculateAllShareIndex() {
+		log.debug("calculateAllShareIndex()");
+
 		AtomicInteger numberOfStocks = new AtomicInteger(0);
 		BigDecimal product = stocks.values().stream()
 				.filter(stock -> stock.containsTrades())
 				.map(stock -> calculateRecentWeightedPriceFor(stock.getSymbol()))
 				.peek(s -> numberOfStocks.incrementAndGet())
 				.reduce(BigDecimal.ONE, BigDecimal::multiply);
+		log.trace("calculateAllShareIndex(): number of stocks={}, product={}", numberOfStocks.get(), product);
 
 		return Decimals.nthRoot(numberOfStocks.get(), product);
 	}
@@ -67,6 +76,8 @@ public class Market {
 	}
 
 	public void register(Stock stock) {
+		log.debug("register(): stock={}", stock);
+
 		stocks.putIfAbsent(stock.getSymbol(), stock);
 	}
 

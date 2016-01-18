@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import pl.ciruk.stockmarket.math.Decimals;
 import pl.ciruk.stockmarket.trade.Trade;
 
@@ -19,6 +20,7 @@ import static pl.ciruk.stockmarket.math.Decimals.isZero;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
+@Slf4j
 public abstract class Stock {
 
 	@Getter
@@ -39,6 +41,8 @@ public abstract class Stock {
 	public abstract BigDecimal calculateDividendYieldFor(BigDecimal priceInPennies);
 
 	public BigDecimal calculatePriceEarningsRatioFor(BigDecimal priceInPennies) {
+		log.debug("calculatePriceEarningsRatioFor(): price={}", priceInPennies);
+
 		Preconditions.checkArgument(priceInPennies != null, "Price cannot be null");
 		BigDecimal normalizedPrice = Decimals.applyDefaultScaleTo(priceInPennies);
 
@@ -57,6 +61,8 @@ public abstract class Stock {
 	}
 
 	public BigDecimal calculateVolumeWeightedPrice(Predicate<Trade> tradeSelector) {
+		log.debug("calculateVolumeWeightedPrice()");
+
 		BigDecimal totalPrice = BigDecimal.ZERO;
 		BigDecimal totalQuantity = BigDecimal.ZERO;
 
@@ -73,6 +79,7 @@ public abstract class Stock {
 		}
 
 		if (isZero(totalQuantity)) {
+			log.debug("calculateVolumeWeightedPrice(): Total quantity is zero");
 			return BigDecimal.ZERO;
 		} else {
 			return Decimals.divide(
@@ -86,6 +93,8 @@ public abstract class Stock {
 	}
 
 	public boolean containsTrades() {
+		log.debug("containsTrades()");
+
 		return !trades.isEmpty();
 	}
 }

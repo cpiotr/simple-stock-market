@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import pl.ciruk.stockmarket.math.Decimals;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import static pl.ciruk.stockmarket.math.Decimals.applyDefaultScaleTo;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Slf4j
 public class PreferredStock extends Stock {
 
 	public PreferredStock(String symbol, BigDecimal parValueInPennies, BigDecimal fixedDividend, BigDecimal lastDividendInPennies) {
@@ -21,6 +23,8 @@ public class PreferredStock extends Stock {
 
 	@Override
 	public BigDecimal calculateDividendYieldFor(BigDecimal priceInPennies) {
+		log.debug("calculateDividendYieldFor(): price={}", priceInPennies);
+
 		Preconditions.checkArgument(priceInPennies != null, "Price cannot be null");
 		Preconditions.checkArgument(BigDecimal.ZERO.compareTo(priceInPennies) != 0, "Price cannot be equal to zero");
 		BigDecimal normalizedPrice = applyDefaultScaleTo(priceInPennies);
